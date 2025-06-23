@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - OCTVision</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('index') }}" class="logo">
+                <i class="fas fa-eye"></i>
+                OCTVision
+            </a>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('about') }}">About</a></li>
+                <li><a href="{{ url_for('predict') }}">Diagnosis</a></li>
+                <li><a href="{{ url_for('contact') }}">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="card fade-in">
+            <div class="card-header">
+                <h1 class="card-title">
+                    <i class="fas fa-chart-line"></i>
+                    Analysis Results
+                </h1>
+                <p class="card-subtitle">AI-powered OCT scan analysis complete</p>
+            </div>
+            
+            <div class="card-body">
+                <div class="result-container">
+                    <!-- Prediction Result -->
+                    <div class="prediction-result prediction-{{ prediction.lower() }} slide-up">
+                        <i class="fas fa-{{ 'exclamation-triangle' if prediction != 'NORMAL' else 'check-circle' }}"></i>
+                        <div style="margin-top: 0.5rem;">
+                            <strong>Diagnosis: {{ prediction }}</strong>
+                        </div>
+                        <div style="font-size: 1rem; margin-top: 0.5rem; opacity: 0.9;">
+                            {% if prediction == 'CNV' %}
+                                Choroidal Neovascularization Detected
+                            {% elif prediction == 'DME' %}
+                                Diabetic Macular Edema Detected
+                            {% elif prediction == 'DRUSEN' %}
+                                Retinal Drusen Deposits Detected
+                            {% else %}
+                                Normal Retinal Structure
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Image Display -->
+                    <div class="image-display slide-up">
+                        <h3 style="margin-bottom: 1rem; color: #2c3e50;">
+                            <i class="fas fa-image"></i>
+                            Analyzed OCT Image
+                        </h3>
+                        <img src="{{ url_for('static', filename='uploads/' + img_path.split('/')[-1]) }}" 
+                            class="result-image" 
+                            alt="OCT Scan Analysis">
+                    </div>
+
+                    <!-- Detailed Results -->
+                    <div class="details-section slide-up">
+                        <h3 class="details-title">
+                            <i class="fas fa-file-medical-alt"></i>
+                            Clinical Details & Recommendations
+                        </h3>
+                        <div class="details-content">
+                            {{ details | safe }}
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="text-center mt-4 slide-up">
+                        <a href="{{ url_for('predict') }}" class="btn btn-primary">
+                            <i class="fas fa-upload"></i>
+                            Analyze Another Image
+                        </a>
+                        <button onclick="downloadReport()" class="btn btn-success">
+                            <i class="fas fa-download"></i>
+                            Download Report
+                        </button>
+                        <button onclick="printReport()" class="btn btn-secondary">
+                            <i class="fas fa-print"></i>
+                            Print Report
+                        </button>
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                            <i class="fas fa-home"></i>
+                            Back to Home
+                        </a>
+                    </div>
+
+                    <!-- Confidence and Additional Info -->
+                    <div class="details-section mt-4 slide-up" style="background: linear-gradient(45deg, #f8f9fa, #e9ecef);">
+                        <h3 class="details-title">
+                            <i class="fas fa-info-circle"></i>
+                            Important Information
+                        </h3>
+                        <div class="details-content">
+                            <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                                <p><strong><i class="fas fa-exclamation-triangle" style="color: #856404;"></i> Medical Disclaimer:</strong></p>
+                                <p style="margin-top: 0.5rem;">This AI analysis is for informational purposes only and should not replace professional medical consultation. Please consult with a qualified ophthalmologist for proper diagnosis and treatment recommendations.</p>
+                            </div>
+                            
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </div>  
+
+
+<!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-eye"></i> OCTVision
+            </div>
+            <p class="footer-description">
+                AI-powered retinal disease detection for better healthcare outcomes
+            </p>
+            <div class="footer-bottom">
+                <p>&copy; 2025 OCTVision. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // File input handling
+        const imageInput = document.getElementById('imageInput');
+        const uploadLabel = document.getElementById('uploadLabel');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        const uploadForm = document.getElementById('uploadForm');
+        const loadingDiv = document.getElementById('loadingDiv');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Update label text
+                uploadLabel.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    <div class="file-upload-text">${file.name}</div>
+                    <div class="file-upload-subtext">Click to change image</div>
+                `;
+                uploadLabel.style.borderColor = '#27ae60';
+                uploadLabel.style.color = '#27ae60';
+
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    imagePreview.classList.remove('hidden');
+                    imagePreview.classList.add('slide-up');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Form submission handling
+        uploadForm.addEventListener('submit', function(e) {
+            if (imageInput.files.length === 0) {
+                e.preventDefault();
+                alert('Please select an image file first.');
+                return;
+            }
+
+            // Show loading animation
+            loadingDiv.style.display = 'block';
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+        });
+
+        // Drag and drop functionality
+        const uploadArea = document.querySelector('.file-upload-label');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            uploadArea.style.background = 'linear-gradient(45deg, rgba(52, 152, 219, 0.3), rgba(155, 89, 182, 0.3))';
+            uploadArea.style.transform = 'scale(1.05)';
+        }
+
+        function unhighlight(e) {
+            uploadArea.style.background = 'linear-gradient(45deg, rgba(52, 152, 219, 0.1), rgba(155, 89, 182, 0.1))';
+            uploadArea.style.transform = 'scale(1)';
+        }
+
+        uploadArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                imageInput.files = files;
+                imageInput.dispatchEvent(new Event('change'));
+            }
+        }
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+                navbar.style.boxShadow = '0 2px 30px rgba(0, 0, 0, 0.15)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+            }
+        });
+
+        function downloadReport() {
+    // Define report content (you can replace this with dynamic content from your page)
+    const reportContent = `
+        OCT Scan Analysis Report:
+
+        Diagnosis: {{ prediction }}
+        Date: {{ current_date }}
+
+        Image Path: {{ img_path }}
+        Additional Details: {{ details }}
+        
+        Medical Disclaimer:
+        This AI analysis is for informational purposes only and should not replace professional medical consultation.
+    `;
+
+    // Create a Blob from the content
+    const blob = new Blob([reportContent], { type: 'text/plain' });
+
+    // Create an anchor element to download the file
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'oct_scan_report.txt';  // Name of the downloaded file
+
+    // Trigger the download
+    link.click();
+}
+
+function printReport() {
+    // You can style the printable content as needed
+    const printContent = document.querySelector('.card').innerHTML;  // Print the entire card
+
+    // Create a new window to print the content
+    const printWindow = window.open('', '', 'height=500, width=800');
+    printWindow.document.write('<html><head><title>Print Report</title></head><body>');
+    printWindow.document.write(printContent);
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.print();  // Trigger the print dialog
+}
+
+
+
+    </script>
+</body>
+</html>

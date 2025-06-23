@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCT Analysis - OCTVision</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('index') }}" class="logo">
+                <i class="fas fa-eye"></i>
+                OCTVision
+            </a>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('about') }}">About</a></li>
+                <li><a href="{{ url_for('predict') }}">Diagnosis</a></li>
+                <li><a href="{{ url_for('contact') }}">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+<main class="main-content">
+    <!-- Section on Retinal Diseases -->
+    <section class="disease-section">
+        <h2>Common Retinal Conditions</h2>
+        <p>Retinal diseases can significantly affect vision, but early detection can help manage or even prevent vision loss. Below are the descriptions of some common retinal conditions:</p>
+
+        <!-- CNV - Choroidal Neovascularization -->
+        <div class="disease-card">
+            <h3>1. Choroidal Neovascularization (CNV)</h3>
+            <p>Choroidal Neovascularization (CNV) refers to the growth of abnormal blood vessels beneath the retina, often leading to leakage of fluid or blood. This condition is commonly associated with age-related macular degeneration (AMD) and can cause significant vision impairment.</p>
+            <ul>
+                <li><strong>Symptoms:</strong> Sudden vision loss, distorted or blurred vision.</li>
+                <li><strong>Causes:</strong> Age, genetics, and existing retinal conditions like AMD.</li>
+                <li><strong>Treatment:</strong> Anti-VEGF injections that prevent abnormal blood vessels from growing.</li>
+            </ul>
+        </div>
+
+        <!-- DME - Diabetic Macular Edema -->
+        <div class="disease-card">
+            <h3>2. Diabetic Macular Edema (DME)</h3>
+            <p>Diabetic Macular Edema (DME) occurs when blood vessels in the retina leak fluid, leading to swelling of the macula, the central part of the retina responsible for sharp, detailed vision. It is a common complication of diabetes.</p>
+            <ul>
+                <li><strong>Symptoms:</strong> Blurry or distorted vision, especially in the center of the visual field.</li>
+                <li><strong>Causes:</strong> High blood sugar levels from diabetes cause damage to retinal blood vessels.</li>
+                <li><strong>Treatment:</strong> Laser therapy, anti-VEGF injections, or corticosteroid injections.</li>
+            </ul>
+        </div>
+
+        <!-- Drusen -->
+        <div class="disease-card">
+            <h3>3. Drusen</h3>
+            <p>Drusen are small yellow deposits that form beneath the retina, often associated with aging. While small amounts of drusen may not cause problems, larger or more numerous drusen can be an early indicator of age-related macular degeneration (AMD).</p>
+            <ul>
+                <li><strong>Symptoms:</strong> Drusen typically don’t cause symptoms directly but can increase the risk of AMD.</li>
+                <li><strong>Causes:</strong> Aging, genetic factors, or environmental factors like smoking.</li>
+                <li><strong>Treatment:</strong> There’s no direct treatment for drusen, but managing risk factors like smoking and diet can help slow progression to AMD.</li>
+            </ul>
+        </div>
+
+        <!-- Normal Retina -->
+        <div class="disease-card">
+            <h3>4. Normal Retina</h3>
+            <p>A normal retina appears smooth and healthy, without signs of damage or abnormal growth. In a healthy eye, the retina works effectively to capture light and send visual signals to the brain for interpretation. Regular eye exams are crucial to ensure the retina stays healthy and free from disease.</p>
+            <ul>
+                <li><strong>Symptoms:</strong> Clear, sharp vision with no visual disturbances.</li>
+                <li><strong>Causes:</strong> Good health, proper nutrition, and eye care.</li>
+                <li><strong>Treatment:</strong> No treatment is necessary for a healthy retina, but regular checkups are essential to maintain eye health.</li>
+            </ul>
+        </div>
+    </section>
+</main>
+
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-eye"></i> OCTVision
+            </div>
+            <p class="footer-description">
+                AI-powered retinal disease detection for better healthcare outcomes
+            </p>
+            <div class="footer-bottom">
+                <p>&copy; 2025 OCTVision. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // File input handling
+        const imageInput = document.getElementById('imageInput');
+        const uploadLabel = document.getElementById('uploadLabel');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        const uploadForm = document.getElementById('uploadForm');
+        const loadingDiv = document.getElementById('loadingDiv');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Update label text
+                uploadLabel.innerHTML = ` 
+                    <i class="fas fa-check-circle"></i>
+                    <div class="file-upload-text">${file.name}</div>
+                    <div class="file-upload-subtext">Click to change image</div>
+                `;
+                uploadLabel.style.borderColor = '#27ae60';
+                uploadLabel.style.color = '#27ae60';
+
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    imagePreview.classList.remove('hidden');
+                    imagePreview.classList.add('slide-up');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Form submission handling
+        uploadForm.addEventListener('submit', function(e) {
+            if (imageInput.files.length === 0) {
+                e.preventDefault();
+                alert('Please select an image file first.');
+                return;
+            }
+
+            // Show loading animation
+            loadingDiv.style.display = 'block';
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+        });
+
+        // Drag and drop functionality
+        const uploadArea = document.querySelector('.file-upload-label');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            uploadArea.style.background = 'linear-gradient(45deg, rgba(52, 152, 219, 0.3), rgba(155, 89, 182, 0.3))';
+            uploadArea.style.transform = 'scale(1.05)';
+        }
+
+        function unhighlight(e) {
+            uploadArea.style.background = 'linear-gradient(45deg, rgba(52, 152, 219, 0.1), rgba(155, 89, 182, 0.1))';
+            uploadArea.style.transform = 'scale(1)';
+        }
+
+        uploadArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                imageInput.files = files;
+                imageInput.dispatchEvent(new Event('change'));
+            }
+        }
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+                navbar.style.boxShadow = '0 2px 30px rgba(0, 0, 0, 0.15)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+            }
+        });
+    </script>
+</body>
+</html>
