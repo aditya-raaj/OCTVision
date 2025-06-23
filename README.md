@@ -7,4 +7,12 @@
 This repository contains the source code for the application and a description of how it works.
 
 ---
+<div align="center">
+  
+  <img src="https://raw.githubusercontent.com/aditya-raaj/OCTVision/main/archive/home.gif" alt="Project demo GIF" />
 
+
+  
+  <img src="https://raw.githubusercontent.com/aditya-raaj/OCTVision/main/archive/diagnose.gif" alt="Project demo GIF" />
+
+</div>
