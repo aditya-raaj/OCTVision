@@ -2,152 +2,207 @@
 
 ## Overview
 
-**OCTVision** is a web-based application that leverages AI to perform automated retinal disease detection from Optical Coherence Tomography (OCT) scan images. It is designed to assist ophthalmologists and healthcare professionals in diagnosing various retinal conditions such as **Choroidal Neovascularization (CNV)**, **Diabetic Macular Edema (DME)**, and **Age-related Macular Degeneration (AMD)** by analyzing OCT scans.
+**OCTVision** is a web-based application that uses Artificial Intelligence (AI) to assist ophthalmologists and healthcare professionals in detecting retinal diseases from Optical Coherence Tomography (OCT) scans. The app automatically analyzes images to classify retinal conditions such as **Choroidal Neovascularization (CNV)**, **Diabetic Macular Edema (DME)**, **Drusen**, and **Normal Retina**.
 
-This repository contains the source code for the application and a description of how it works.
+The system utilizes a deep learning model based on **MobileNetV3Large** for efficient and accurate predictions, making it suitable for deployment in low-compute environments.
 
 ---
-<div align="center">
-  
-  <img src="https://raw.githubusercontent.com/aditya-raaj/OCTVision/main/archive/home.gif" alt="Project demo GIF" />
 
+<div align="center">
+  <img src="https://raw.githubusercontent.com/aditya-raaj/OCTVision/main/archive/home.png" alt="Project demo GIF" />
 </div>
 
-
-
 ---
-
-
 
 ## Features
 
-- **AI-Powered Disease Detection**: Automatic analysis of OCT scan images for various retinal conditions.
-- **User-Friendly Interface**: Web-based interface for uploading OCT images, displaying results, and managing diagnoses.
-- **Prediction Models**: Machine learning models trained on large retinal image datasets to detect CNV, DME, and AMD.
-- **Real-time Results**: Get instant predictions based on uploaded OCT images.
-- **Responsive Design**: Accessible across different devices (desktop, tablet, mobile).
-- **Data Privacy**: Sensitive image data is processed locally and not uploaded to external servers (unless specified).
-
+- **AI-Powered Disease Detection**: Automatically classify OCT images into four categories: CNV, DME, Drusen, and Normal Retina.
+- **Real-Time Predictions**: Instant predictions based on uploaded images.
+- **User-Friendly Interface**: Web interface for easy image uploads and result viewing.
+- **Lightweight Model**: MobileNetV3 for high efficiency and fast predictions.
+- **Responsive Design**: Access the app on desktop, tablet, or mobile devices.
+- **Data Privacy**: Image data is processed locally with no external server uploads (unless specified).
 
 <div align="center">
   <img src="https://raw.githubusercontent.com/aditya-raaj/OCTVision/main/archive/diagnose.gif" alt="Project demo GIF" />
-
 </div>
+
+---
+
+## Table of Contents
+
+1. [Project Overview](#project-overview)
+2. [Dataset](#dataset)
+3. [Model Architecture](#model-architecture)
+4. [Training and Evaluation](#training-and-evaluation)
+5. [Deployment](#deployment)
+6. [How to Use](#how-to-use)
+7. [Retinal Diseases](#retinal-diseases)
+8. [Future Work](#future-work)
+9. [References](#references)
+
+---
+
+## Project Overview
+
+OCTVision provides an automated solution for detecting retinal conditions using **Optical Coherence Tomography (OCT)** images. The system uses a MobileNetV3-based model to classify OCT images into one of the following categories:
+
+- **Choroidal Neovascularization (CNV)**
+- **Diabetic Macular Edema (DME)**
+- **Drusen (Early AMD)**
+- **Normal Retina**
+
+The app is deployed as a **Flask-based web service** with a REST API endpoint for prediction.
+
+---
+
+## Dataset
+
+- **Source**: [Mendeley Dataset](https://doi.org/10.17632/rscbjbr9sj.3)
+- **OCT Images**: ~84,495 images, split into categories:
+  - CNV: ~37,000 images
+  - DME: ~11,500 images
+  - Drusen: ~8,600 images
+  - Normal: ~51,000 images
+- **File Format**: JPEG
+- **Resolution**: ~500x500 (resized to 224x224 for training)
+- **Class Imbalance**: Handled using class weighting and balanced batch sampling.
+
+---
+
+## Model Architecture
+
+<img src="https://github.com/aditya-raaj/OCTVision/blob/main/archive/MobileNetArch.png" alt="MobileNet" style="width: 100%;" />
+
+
+**MobileNetV3Large** is used for efficient and accurate classification of OCT images. Key features of MobileNetV3 include:
+
+- Depthwise separable convolutions
+- Squeeze-and-excitation modules
+- Hard-swish activations
+- Efficient computation for real-time predictions
+
+---
+
+## Training and Evaluation
+
+### Training Details
+
+<img src="https://github.com/aditya-raaj/OCTVision/blob/main/archive/LossResult.png" alt="" style="width: auto; height: auto;" />
+
+- **Loss Function**: Categorical Crossentropy
+- **Optimizer**: Adam (lr = 0.001)
+- **Metrics**: Accuracy, F1-Score
+- **Epochs**: 20
+- **Batch Size**: 32
+- **Hardware**: CPU, 8GB RAM laptop
+
+<br>
+
+
+### Final Metrics (Epoch 20/20)
+
+- **Training Accuracy**: 99.30%
+- **Validation Accuracy**: 97.26%
+- **Training F1-Score**: 0.9980
+- **Validation F1-Score**: 0.9912
+
+  <img src="https://github.com/aditya-raaj/OCTVision/blob/main/archive/ConfustionMatrix.png" alt="" style="width: auto; height: auto;" />
+
+---
+
+## Deployment
+
+The backend is built using **Flask**, and predictions are made via a REST API endpoint.
+
+- **API Endpoint**: `/predict`
+- Accepts a POST request with an image file (JPEG format).
+- Returns the predicted class (CNV, DME, Drusen, Normal).
+
+---
+
+## How to Use
+
+1. **Clone the Repository**:
+   Clone the repository from GitHub and navigate into the project directory.
+
+2. **Set up Dependencies**:
+   Install the required Python libraries by running the following command:
+
+
+```
+
+
+pip install -r requirements.txt
+
+```
+
+3. **Start the Flask Server**:
+Run the Flask app by executing:
+
+```
+
+python app.py
+
+```
+
+
+
+4. **Use the Web Interface**:
+- Visit `http://localhost:5000` in your browser.
+- Upload an OCT image to receive real-time predictions.
+
+---
+
+## Retinal Diseases
+
+### 1. **Choroidal Neovascularization (CNV)**
+
+- **Recommendation**: Immediate referral to a retinal specialist. CNV is often linked to age-related macular degeneration (AMD).
+- **Treatment Options**: Anti-VEGF injections, Photodynamic Therapy, Laser Treatment.
+
+<img src="https://github.com/aditya-raaj/OCTVision/blob/main/archive/CNV.jpeg" alt="CNV" style="width: 100%; height: auto;" />
+
+
+### 2. **Diabetic Macular Edema (DME)**
+
+- **Recommendation**: Coordination with an endocrinologist for diabetes management. Anti-VEGF injections are often the first-line treatment.
+- **Treatment Options**: Anti-VEGF therapy, corticosteroid implants, laser therapy.
+
+
+<img src="https://github.com/aditya-raaj/OCTVision/blob/main/archive/DME.jpeg" alt="DME" style="width: 100%; height: auto;" />
+
+### 3. **Drusen (Early AMD)**
+
+- **Recommendation**: Lifestyle modifications, including a diet rich in antioxidants. Regular OCT scans and potential use of AREDS2 supplements.
+- **Treatment Options**: Dietary changes, supplements, smoking cessation.
+
+
+<img src="https://github.com/aditya-raaj/OCTVision/blob/main/archive/DRUSEN.jpeg" alt="DRUSEN" style="width: 100%; height: auto;" />
+
+### 4. **Normal Retina**
+
+- **Recommendation**: Regular eye exams and maintenance of general health, including blood sugar and blood pressure control.
+
+
+<img src="https://github.com/aditya-raaj/OCTVision/blob/main/archive/NORMAL.jpeg" alt="NORMAL" style="width: 100%; height: auto;" />
 
 
 ---
 
+## Future Work
 
-
-
-
-# Retina Based Diseases
-
-
-## For CNV (Choroidal Neovascularization):
-
-<div align="center">
-
-  
-![CNV](https://github.com/aditya-raaj/OCTVision/blob/main/archive/CNV.jpeg)
-
-
-
-</div>
-
-- **Recommendation**:
-    - **Immediate Referral**: Seek prompt evaluation by a retinal specialist. CNV is often associated with conditions like age-related macular degeneration (AMD) and can lead to significant vision loss if left untreated.
-    - **Treatment Options**:
-        - **Anti-VEGF Therapy**: Anti-vascular endothelial growth factor (anti-VEGF) injections such as Ranibizumab or Aflibercept are commonly used to halt or slow the progression of CNV.
-        - **Photodynamic Therapy (PDT)**: In some cases, photodynamic therapy may be used alongside anti-VEGF injections.
-        - **Laser Treatment**: Though less commonly used now, laser therapy may be recommended in certain situations.
-    - **Lifestyle and Monitoring**:
-        - **Diet**: A diet rich in leafy greens, omega-3 fatty acids, and antioxidants (e.g., lutein, zeaxanthin) can help support retinal health.
-        - **Supplements**: Consider supplements such as AREDS2 formulation for patients with AMD.
-        - **Regular Monitoring**: Repeat OCT scans every 1 to 3 months to assess response to treatment and progression of disease.
-    - **Next Steps**:
-        - Schedule immediate follow-up with a retina specialist.
-        - If receiving anti-VEGF injections, expect regular treatments initially, with the frequency tapering as the condition stabilizes.
+- **Model Improvements**: Integrating Grad-CAM or saliency maps for model interpretability.
+- **Exploring Larger Models**: Testing Vision Transformers (ViT) on more powerful hardware.
+- **Extended Features**: Adding database support, user management, and expanding to other ophthalmic conditions.
 
 ---
 
+## References
 
-
-## For DME (Diabetic Macular Edema):
-
-<div align="center">
-
-  
-![DME](https://github.com/aditya-raaj/OCTVision/blob/main/archive/DME.jpeg)
-
-</div>
-
-- **Recommendation**:
-    - **Endocrinology Consultation**: In addition to ophthalmic care, close coordination with an endocrinologist is essential to manage systemic diabetes, which directly impacts the progression of DME.
-    - **Treatment Options**:
-        - **Anti-VEGF Injections**: Similar to CNV, anti-VEGF therapy is the first-line treatment to reduce retinal swelling and improve vision.
-        - **Corticosteroid Implants**: In cases where anti-VEGF is less effective, intravitreal steroid injections or implants may be considered.
-        - **Laser Photocoagulation**: Focal or grid laser therapy may be used to treat areas of leakage, especially in non-central-involved DME.
-    - **Blood Sugar and Blood Pressure Control**:
-        - **Strict Glycemic Control**: Keeping HbA1c levels below 7% is crucial to slowing the progression of diabetic retinopathy and macular edema.
-        - **Blood Pressure Management**: Hypertension worsens DME; aim to maintain a blood pressure below 140/80 mmHg.
-    - **Monitoring**:
-        - **Frequent Eye Exams**: Patients with DME require regular OCT scans (every 3 to 6 months) to monitor fluid accumulation and treatment response.
-        - **Diabetes Management**: Tight control of blood sugar and blood pressure levels will help prevent future episodes of macular edema.
-    - **Next Steps**:
-        - Schedule a visit with both your retina specialist and endocrinologist.
-        - Begin or continue anti-VEGF treatment as needed, and ensure systemic conditions are tightly managed.
-
----
-
-
-
-## For Drusen (Early AMD):
-
-
-<div align="center">
-
-  
-![DRUSEN](https://github.com/aditya-raaj/OCTVision/blob/main/archive/DRUSEN.jpeg)
-
-</div>
-
-- **Recommendation**:
-    - **Dietary Changes**:
-        - **High in Antioxidants**: Incorporate foods rich in vitamins C, E, zinc, copper, and beta-carotene, which can help slow the progression of AMD. Spinach, kale, and fish rich in omega-3s are beneficial.
-        - **Supplements**: The **AREDS2** (Age-Related Eye Disease Study 2) formulation is recommended for patients at moderate to high risk of progression to advanced AMD.
-    - **Lifestyle Modifications**:
-        - **Quit Smoking**: Smoking greatly increases the risk of AMD progression and should be avoided.
-        - **UV Protection**: Wear sunglasses with UV protection to reduce retinal damage from harmful sunlight exposure.
-    - **Monitoring**:
-        - **Regular OCT Scans**: For early AMD or drusen, repeat OCT imaging every 6 to 12 months to track changes in retinal structure.
-        - **Amsler Grid Monitoring**: Use an Amsler grid at home to self-monitor for sudden vision changes, such as wavy lines or blank spots, which could indicate progression to wet AMD.
-    - **Next Steps**:
-        - Discuss AREDS2 supplements and lifestyle changes with your healthcare provider.
-        - Schedule routine OCT scans to monitor drusen size and any potential advancement of AMD.
-
----
-
-
-
-## For Normal Retina:
-
-
-<div align="center">
-
-  
-![NORMAL](https://github.com/aditya-raaj/OCTVision/blob/main/archive/NORMAL.jpeg)
-
-</div>
-
-- **Recommendation**:
-    - **Routine Eye Care**: While your OCT scan shows a normal retina, it’s essential to maintain regular eye exams, particularly if you have risk factors like a family history of retinal diseases.
-    - **Eye Health Maintenance**:
-        - **Balanced Diet**: Continue a diet rich in nutrients that support eye health, such as dark leafy greens, fish high in omega-3 fatty acids, and foods rich in antioxidants.
-        - **Sun Protection**: Wear sunglasses with UV protection to minimize the risk of retinal damage from sunlight.
-    - **Next Steps**:
-        - If you have no symptoms or vision problems, follow up with routine eye exams as recommended by your ophthalmologist (typically every 1 to 2 years).
-        - Maintain general health practices, including managing conditions like diabetes or hypertension that could affect retinal health.
-
----
+1. [Mendeley Dataset](https://doi.org/10.17632/rscbjbr9sj.3)
+2. Howard et al., "Searching for MobileNetV3", arXiv:1905.02244
+3. [TensorFlow Documentation](https://www.tensorflow.org/)
+4. [Keras Documentation](https://keras.io/)
+5. [Flask Documentation](https://flask.palletsprojects.com/)
 
