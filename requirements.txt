@@ -6,3 +6,9 @@ Flask
 tensorflow
 numpy
 Pillow
+transformers
+datasets
+timm
+torchvision
+torchaudio
+

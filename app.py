@@ -8,7 +8,7 @@ from recommendation import cnv, dme, drusen, normal
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-model = tf.keras.models.load_model(r".\notebook\trained_retinal_model.h5")
+model = tf.keras.models.load_model(r".\notebook\trained_retinal_model_v2.h5")
 
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
